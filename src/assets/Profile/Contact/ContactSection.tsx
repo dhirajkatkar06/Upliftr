@@ -235,7 +235,7 @@
 // }
 
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import { useState } from "react";
+import { useState ,useRef } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import * as Yup from "yup";
@@ -243,6 +243,7 @@ import emailjs from "@emailjs/browser";
 import teamMembers from "../../../../data/team";
 import { createSlug } from "../../../slug/utils";
 import { SectionProps } from "../../Home/App";
+
 
 export interface FormValues {
   firstName: string;
@@ -273,6 +274,11 @@ export default function ContactSection({ id }: SectionProps) {
   const [isSent, setSent] = useState(false);
   const [transitionStatus, setTransitionStatus] = useState(false);
   const [firstName, setFirstName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // const [isSent, setSent] = useState(false);
+  // const [transitionStatus, setTransitionStatus] = useState(false);
+  // const [firstName, setFirstName] = useState("");
 
   const handleTransition = () => {
     setTransitionStatus(true);
@@ -291,7 +297,9 @@ export default function ContactSection({ id }: SectionProps) {
     return <div>Contact information not found!</div>;
   }
 
+  const submitLockRef = useRef(false);  
   const onSubmit = async (data: FormValues, { resetForm, setSubmitting }: any) => {
+    if (submitLockRef.current) return;
     setSubmitting(true);
     try {
       // 1️⃣ Send email to admin
