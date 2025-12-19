@@ -239,6 +239,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import * as Yup from "yup";
+import emailjs from "@emailjs/browser";
 import teamMembers from "../../../../data/team";
 import { createSlug } from "../../../slug/utils";
 import { SectionProps } from "../../Home/App";
@@ -258,22 +259,14 @@ const schema = Yup.object().shape({
   lastName: Yup.string()
     .min(2, "Please make sure your last name is at least 2 letters.")
     .max(200, "That's a bit too long. Try shortening it.")
-    .required(
-      "To make this process a bit smoother, we also need your last name."
-    ),
+    .required("We also need your last name."),
   email: Yup.string()
-    .email(
-      "Hmm, that doesn't look quite right. Your email address should look like something like this: example@company.se"
-    )
-    .matches(
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      "Hmm, that doesn't look quite right. Your email address should look like something like this: example@company.se"
-    )
-    .required("We need your email address to get back to you."),
+    .email("Please enter a valid email address.")
+    .required("We need your email address."),
   message: Yup.string()
     .min(10, "Please give us a bit more information about your request.")
-    .max(10000, "That's a bit too long. Try shortening it.")
-    .required("Please write us a message, we'd love to hear from you!"),
+    .max(10000, "That's a bit too long.")
+    .required("Please write us a message!"),
 });
 
 export default function ContactSection({ id }: SectionProps) {
@@ -289,23 +282,42 @@ export default function ContactSection({ id }: SectionProps) {
     }, 200);
   };
 
-  const onSubmit = async (data: FormValues, { resetForm, setSubmitting }: any) => {
-    try {
-      setSubmitting(true);
-      const res = await fetch("/api/contact", {  // Relative path works with Vercel serverless
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
+  const { name } = useParams();
+  const teamMember = teamMembers.find(
+    (member) => createSlug(member.name) === name
+  );
 
-      if (result.success) {
-        setFirstName(data.firstName);
-        handleTransition();
-        resetForm();
-      } else {
-        alert("Something went wrong! Please try again.");
-      }
+  if (!teamMember) {
+    return <div>Contact information not found!</div>;
+  }
+
+  const onSubmit = async (data: FormValues, { resetForm, setSubmitting }: any) => {
+    setSubmitting(true);
+    try {
+      // 1️⃣ Send email to admin
+      await emailjs.send(
+        "service_3j56lfq",
+        "template_ka7zeiy",
+        {
+          ...data,
+          phone: "", // add phone if needed
+        },
+        "GMKElwlFnzP2YGuej"
+      );
+
+      // 2️⃣ Send auto-reply to user
+      await emailjs.send(
+        "service_3j56lfq",
+        "template_me80jv5",
+        {
+          ...data,
+        },
+        "GMKElwlFnzP2YGuej"
+      );
+
+      setFirstName(data.firstName);
+      handleTransition();
+      resetForm();
     } catch (error) {
       console.error(error);
       alert("Something went wrong! Please try again.");
@@ -313,13 +325,6 @@ export default function ContactSection({ id }: SectionProps) {
       setSubmitting(false);
     }
   };
-
-  const { name } = useParams();
-  const teamMember = teamMembers.find(
-    (member) => createSlug(member.name) === name
-  );
-
-  if (!teamMember) return <div>Contact information not found!</div>;
 
   return (
     <TransitionWrapper $transitionStatus={transitionStatus} id={id}>
@@ -361,7 +366,6 @@ export default function ContactSection({ id }: SectionProps) {
                       </ErrorText>
                     </label>
                   </ContactFormRow>
-
                   <ContactFormRow>
                     <label>
                       <span style={{ fontWeight: "bold" }}>
@@ -373,7 +377,6 @@ export default function ContactSection({ id }: SectionProps) {
                       </ErrorText>
                     </label>
                   </ContactFormRow>
-
                   <ContactFormRow>
                     <label>
                       <span style={{ fontWeight: "bold" }}>
@@ -395,13 +398,11 @@ export default function ContactSection({ id }: SectionProps) {
                       </ErrorText>
                     </label>
                   </ContactFormRow>
-
                   <Button type="submit">Send Message</Button>
                 </Form>
               </Formik>
             </div>
           </div>
-
           <div className="grid-container">
             <Title>Or reach me in another way</Title>
             <div className="grid">
@@ -421,22 +422,15 @@ export default function ContactSection({ id }: SectionProps) {
       ) : (
         <>
           <div className="grid-container">
-            <FormTitle>
-              Thank you for reaching out to us, {firstName}!
-            </FormTitle>
+            <FormTitle>Thank you for reaching out, {firstName}!</FormTitle>
           </div>
           <div className="grid-container">
             <div className="grid">
               <Paragraph>
-                I'm thrilled to hear from you, and I will get back to you as
-                soon as possible. Meanwhile, check our <a href="/cases">cases</a> or <a href="/team">team section</a>.
+                I'm thrilled to hear from you. In the meanwhile, check our <a href="/#cases">cases</a> or <a href="/#team">What We Do Best</a>.
               </Paragraph>
-              <Paragraph style={{ marginBottom: "0rem" }}>
-                See you soon,
-              </Paragraph>
-              <Paragraph style={{ fontWeight: "bold" }}>
-                Your new business partner
-              </Paragraph>
+              <Paragraph style={{ marginBottom: "0rem" }}>See you soon,</Paragraph>
+              <Paragraph style={{ fontWeight: "bold" }}>Your new business partner</Paragraph>
             </div>
           </div>
         </>
@@ -445,7 +439,7 @@ export default function ContactSection({ id }: SectionProps) {
   );
 }
 
-// ========================== Styled Components ==========================
+// --- Styled Components ---
 const FormTitle = styled.h3`
   grid-column: main;
   font-size: var(--font-size-m);
@@ -568,4 +562,5 @@ const ContactInfo = styled.li`
     }
   }
 `;
+
 
