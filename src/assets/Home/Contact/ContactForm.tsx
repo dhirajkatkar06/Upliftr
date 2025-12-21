@@ -1,3 +1,4 @@
+
 // import { ErrorMessage, Field, Form, Formik } from "formik";
 // import { useRef, useState } from "react";
 // import styled from "styled-components";
@@ -41,7 +42,6 @@
 //     if (submitLockRef.current) return;
 //     submitLockRef.current = true;
 
-//     // ✅ EmailJS template params
 //     const templateParams: Record<string, string> = {
 //       firstName: data.firstName,
 //       lastName: data.lastName,
@@ -50,15 +50,12 @@
 //     };
 
 //     try {
-//       // Admin email
 //       await emailjs.send(
 //         "service_3j56lfq",
 //         "template_ka7zeiy",
 //         templateParams,
 //         "GMKElwlFnzP2YGuej"
 //       );
-
-//       // User confirmation email
 //       await emailjs.send(
 //         "service_3j56lfq",
 //         "template_me80jv5",
@@ -79,75 +76,82 @@
 
 //   return (
 //     <PageWrapper>
-//       <FormCard>
-//         {!isSent ? (
-//           <>
-//             <Title>Contact Us</Title>
+//       <ContentWrapper>
+//         <FormCard>
+//           {!isSent ? (
+//             <>
+//               <Title>Contact Us</Title>
 
-//             <Formik
-//               initialValues={{
-//                 firstName: "",
-//                 lastName: "",
-//                 email: "",
-//                 message: "",
-//               }}
-//               validationSchema={schema}
-//               onSubmit={onSubmit}
-//             >
-//               <Form>
-//                 <Row>
+//               <Formik
+//                 initialValues={{
+//                   firstName: "",
+//                   lastName: "",
+//                   email: "",
+//                   message: "",
+//                 }}
+//                 validationSchema={schema}
+//                 onSubmit={onSubmit}
+//               >
+//                 <Form>
+//                   <Row>
+//                     <label>
+//                       First Name *
+//                       <StyledField name="firstName" />
+//                       <ErrorText>
+//                         <ErrorMessage name="firstName" />
+//                       </ErrorText>
+//                     </label>
+
+//                     <label>
+//                       Last Name *
+//                       <StyledField name="lastName" />
+//                       <ErrorText>
+//                         <ErrorMessage name="lastName" />
+//                       </ErrorText>
+//                     </label>
+//                   </Row>
+
 //                   <label>
-//                     First Name *
-//                     <StyledField name="firstName" />
+//                     Email *
+//                     <StyledField type="email" name="email" />
 //                     <ErrorText>
-//                       <ErrorMessage name="firstName" />
+//                       <ErrorMessage name="email" />
 //                     </ErrorText>
 //                   </label>
 
 //                   <label>
-//                     Last Name *
-//                     <StyledField name="lastName" />
+//                     Message *
+//                     <Field
+//                       as="textarea"
+//                       name="message"
+//                       rows={5}
+//                       style={{ padding: "8px", fontFamily: "inherit" }}
+//                     />
 //                     <ErrorText>
-//                       <ErrorMessage name="lastName" />
+//                       <ErrorMessage name="message" />
 //                     </ErrorText>
 //                   </label>
-//                 </Row>
 
-//                 <label>
-//                   Email *
-//                   <StyledField type="email" name="email" />
-//                   <ErrorText>
-//                     <ErrorMessage name="email" />
-//                   </ErrorText>
-//                 </label>
+//                   <Button type="submit">Send Message</Button>
+//                 </Form>
+//               </Formik>
+//             </>
+//           ) : (
+//             <>
+//               <Title>Thank you, {firstName}!</Title>
+//               <Paragraph>
+//                 Your message has been received successfully.  
+//                 We’ll get back to you shortly.
+//               </Paragraph>
+//             </>
+//           )}
+//         </FormCard>
 
-//                 <label>
-//                   Message *
-//                   <Field
-//                     as="textarea"
-//                     name="message"
-//                     rows={5}
-//                     style={{ padding: "8px", fontFamily: "inherit" }}
-//                   />
-//                   <ErrorText>
-//                     <ErrorMessage name="message" />
-//                   </ErrorText>
-//                 </label>
-
-//                 <Button type="submit">Send Message</Button>
-//               </Form>
-//             </Formik>
-//           </>
-//         ) : (
-//           <>
-//             <Title>Thank you, {firstName}!</Title>
-//             <Paragraph>
-//               Your message has been sent successfully.  
-//               We’ll get back to you shortly.
-//             </Paragraph>
-//           </>
-//         )}
-//       </FormCard>
+//         {/* Right Side Image Placeholder */}
+//         <ImageCard>
+//           <PlaceholderImage src="/images/gage.png" alt="Demo" />
+//         </ImageCard>
+//       </ContentWrapper>
 //     </PageWrapper>
 //   );
 // }
@@ -157,13 +161,36 @@
 //   min-height: 100vh;
 //   display: flex;
 //   justify-content: center;
-//   align-items: center;
+//   align-items: flex-start;
 //   padding: 2rem;
 // `;
 
-// const FormCard = styled.div`
+// const ContentWrapper = styled.div`
+//   display: flex;
+//   gap: 2rem;
 //   width: 100%;
-//   max-width: 700px;
+//   max-width: 1200px;
+
+//   @media (max-width: 900px) {
+//     flex-direction: column;
+//     align-items: center;
+//   }
+// `;
+
+// const FormCard = styled.div`
+//   flex: 1;
+// `;
+
+// const ImageCard = styled.div`
+//   flex: 1;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+// `;
+
+// const PlaceholderImage = styled.img`
+//   max-width: 60%;
+//   border-radius: 8px;
 // `;
 
 // const Title = styled.h2`
@@ -233,14 +260,13 @@ const schema = Yup.object().shape({
 export default function ContactForm() {
   const [isSent, setSent] = useState(false);
   const [firstName, setFirstName] = useState("");
+  const [isSubmitting, setSubmittingState] = useState(false);
   const submitLockRef = useRef(false);
 
-  const onSubmit = async (
-    data: FormValues,
-    { resetForm, setSubmitting }: any
-  ) => {
+  const onSubmit = async (data: FormValues, { resetForm }: any) => {
     if (submitLockRef.current) return;
     submitLockRef.current = true;
+    setSubmittingState(true);
 
     const templateParams: Record<string, string> = {
       firstName: data.firstName,
@@ -250,12 +276,14 @@ export default function ContactForm() {
     };
 
     try {
+      // Admin email
       await emailjs.send(
         "service_3j56lfq",
         "template_ka7zeiy",
         templateParams,
         "GMKElwlFnzP2YGuej"
       );
+      // User confirmation email
       await emailjs.send(
         "service_3j56lfq",
         "template_me80jv5",
@@ -265,12 +293,18 @@ export default function ContactForm() {
 
       setFirstName(data.firstName);
       setSent(true);
-      resetForm();
+
+      // Auto-hide Thank You message after 5 seconds
+      setTimeout(() => {
+        setSent(false);
+        resetForm();
+      }, 5000);
+
     } catch (err) {
       alert("Something went wrong. Please try again.");
     } finally {
-      setSubmitting(false);
       submitLockRef.current = false;
+      setSubmittingState(false);
     }
   };
 
@@ -332,7 +366,9 @@ export default function ContactForm() {
                     </ErrorText>
                   </label>
 
-                  <Button type="submit">Send Message</Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? <Spinner /> : "Send Message"}
+                  </Button>
                 </Form>
               </Formik>
             </>
@@ -340,7 +376,7 @@ export default function ContactForm() {
             <>
               <Title>Thank you, {firstName}!</Title>
               <Paragraph>
-                Your message has been sent successfully.  
+                Your message has been received successfully.  
                 We’ll get back to you shortly.
               </Paragraph>
             </>
@@ -418,6 +454,26 @@ const StyledField = styled(Field)`
 
 const Button = styled.button`
   margin-top: 1.5rem;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Spinner = styled.div`
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 0.8s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 `;
 
 const ErrorText = styled.div`
@@ -425,3 +481,4 @@ const ErrorText = styled.div`
   font-size: 12px;
   margin-top: 4px;
 `;
+
