@@ -1,5 +1,8 @@
 import styled from "styled-components";
 import { TeamMember } from "../../../../data/team";
+import { useNavigate } from "react-router-dom";
+import { createSlug } from "../../../slug/utils";
+
 
 interface Props {
   person: TeamMember;
@@ -17,11 +20,18 @@ export default function TeamCard({
   onMouseEnter,
   onMouseLeave,
 }: Props) {
+  const navigate = useNavigate();
+  const slug = createSlug(name);
+
   return (
     <Card
       className={className}
       $activePerson={$activePerson}
-      onClick={() => setActivePerson()}
+      onClick={() => {
+        setActivePerson();                // existing behavior
+        navigate(`/profile/${slug}`);     // ✅ added behavior
+      }}
+      // onClick={() => setActivePerson()}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
