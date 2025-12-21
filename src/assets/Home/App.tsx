@@ -7,6 +7,10 @@ import CaseSection from "./Cases/CaseSection";
 import HeroSection from "./Hero/HeroSection";
 import MapSection from "./Map/MapSection";
 import TeamSection from "./Team/TeamSection";
+import ContactSection from "./Contact/ContactMidPath";
+import WhatsAppButton from "./Whatsapp/WhatsAppButton"; // adjust path
+
+
 
 export interface SectionProps {
   id: string;
@@ -30,7 +34,13 @@ function App() {
       <BrandSection id="clients" />
       <CaseSection id="cases" />
       <MapSection id="map" />
+      <ContactSection id="contact" />
       <Footer />
+      {/* WhatsApp Floating Button */}
+      <WhatsAppButton 
+        phone="919769708255" // replace with your number
+        message="Hello! I would like to get in touch with you." // default message
+      />
     </>
   );
 }

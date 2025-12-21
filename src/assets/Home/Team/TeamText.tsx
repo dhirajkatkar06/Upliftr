@@ -22,7 +22,7 @@ export default function TeamText({
         <h4>{jobTitle}</h4>
         <p>{description}</p>
         <StyledNavLink to={`/profile/${slug}`}>
-          Go to profile <img src={arrow} alt="arrow" />
+          Go to services <img src={arrow} alt="arrow" />
         </StyledNavLink>
       </InfoSection>
       <Quote $activePerson={$activePerson}>

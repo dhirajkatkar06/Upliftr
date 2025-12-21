@@ -185,6 +185,11 @@ function NavigationMenu({
               <NavLink href="/#map" onClick={() => handleLinkClick("map")}>
                 <Number>04</Number> Find us here
               </NavLink>
+              <Divider />
+              <NavLink href="/#contact" onClick={() => handleLinkClick("contact")}>
+                <Number>05</Number> Contact Us
+              </NavLink>
+
             </StyledNavigationMenu>
           </Container>
         </div>

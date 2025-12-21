@@ -10,7 +10,7 @@ function HeroSection({ id }: SectionProps) {
         <video id="background-video" autoPlay loop muted poster={video}>
           <source src={video} type="video/mp4" />
         </video>
-        <h1>Elevating Brands Through Digital Creativity</h1>
+        <h1>Igniting Brands with Digital Magic</h1>
       </Video>
       <TextContainer className="textContainer">
         <p>
