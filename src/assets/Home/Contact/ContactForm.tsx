@@ -237,6 +237,7 @@ interface FormValues {
   firstName: string;
   lastName: string;
   email: string;
+  service: string; // ✅ added
   message: string;
 }
 
@@ -251,10 +252,12 @@ const schema = Yup.object().shape({
   email: Yup.string()
     .email("Please enter a valid email address.")
     .required("Email is required"),
+  service: Yup.string().required("Please select a service"),
   message: Yup.string()
     .min(10, "Please give us a bit more information.")
     .required("Message is required"),
 });
+
 
 // ------------------ PAGE ------------------
 export default function ContactForm() {
@@ -269,9 +272,9 @@ export default function ContactForm() {
     setSubmittingState(true);
 
     const templateParams: Record<string, string> = {
-      firstName: data.firstName,
-      lastName: data.lastName,
+      name: `${data.firstName} ${data.lastName}`, // ✅ merged EXACTLY
       email: data.email,
+      service: data.service,
       message: data.message,
     };
 
@@ -321,6 +324,7 @@ export default function ContactForm() {
                   firstName: "",
                   lastName: "",
                   email: "",
+                  service: "",
                   message: "",
                 }}
                 validationSchema={schema}
@@ -350,6 +354,21 @@ export default function ContactForm() {
                     <StyledField type="email" name="email" />
                     <ErrorText>
                       <ErrorMessage name="email" />
+                    </ErrorText>
+                  </label>
+
+                  <label>
+                    Service *
+                    <Field as="select" name="service">
+                      <option value="">Select a service</option>
+                      <option value="Performance Marketing">Performance Marketing</option>
+                      <option value="Social Media Management">Social Media Management</option>
+                      <option value="Content Creation">Content Creation</option>
+                      <option value="Production Shoot">Production Shoot</option>
+                      <option value="Creative Ideation">Creative Ideation</option>
+                    </Field>
+                    <ErrorText>
+                      <ErrorMessage name="service" />
                     </ErrorText>
                   </label>
 
